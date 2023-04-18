@@ -99,14 +99,9 @@ async function mainMenu() {
               const answer = await inquirer.prompt({
                 type: 'input',
                 message: 'What is the name of the department',
-                name: 'deptName',
-                validate: (answer) => {
-                    if (answer.length != 3) {
-                        return 'Please enter only 3 characters'
-                    }
-                    return true
+                name: 'deptName'
                 }
-              })
+              )
               db.query(`INSERT INTO departments (name) VALUES ('${answer.deptName}')`, (error) => {
                 if (error) {
                   console.error(error);
@@ -200,34 +195,62 @@ async function mainMenu() {
         ])
           let empManager_id
            const empRole_id = roles.indexOf(answer.empRole) + 1
-           if (answer.empManager === 'none') { // check if 'none' was selected
-            empManager_id = null; // set manager ID to null
+           if (answer.empManager === 'none') {
+            empManager_id = null;
           } else {
             empManager_id = managers.indexOf(answer.empManager) + 1;
           }
-
-
            db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ('${answer.empFirst}', '${answer.empLast}', ${empRole_id}, ${empManager_id} );`, (error) => {
             if (error) {
               console.error(error);
             } else {
               console.log(`Added department '${answer.deptName}' to database.`);
             }
-          });
-           
-          
-          
-          
-          
-          
+          });         
             break;
 
 
         // Update an employee role  
         case 'Update an employee role':
-            console.log('no rly6')
-          break;
-
+          const empObj = await db.promise().query(`
+              SELECT CONCAT(first_name, ' ', last_name) AS employee
+              FROM employees;`)
+          const empArr = empObj[0]
+          const employees = empArr.map(({employee}) => employee)
+          console.log(employees)
+          const empRoleObj = await db.promise().query(`
+              SELECT title FROM employee_chart_db.roles;
+            `);                           
+          const empRoleArr = empRoleObj[0]
+          const empRoles = empRoleArr.map(({ title }) => title)
+          console.log(empRoles)
+          const updateAnswer = await inquirer.prompt([
+          {
+            type: 'list',
+            name: 'updateEmployee',
+            message: 'Which employee is changing roles?',
+            choices: employees
+          },
+          {
+            type: 'list',
+            name: 'updateRole',
+            message: 'What is the employee\'s new role?',
+            choices: empRoles
+          }])
+          
+          newRole_idObj = await db.promise().query(`SELECT id FROM roles WHERE title = '${updateAnswer.updateRole}';`)
+          let newRole_id = newRole_idObj[0][0].id
+          console.log(newRole_id)
+          
+          const [first_name, last_name] = updateAnswer.updateEmployee.split(' ');
+          db.query(`UPDATE employees SET role_id = ${newRole_id} WHERE first_name = '${first_name}' AND last_name = '${last_name}';`, (error) => {
+            if (error) {
+              console.error(error);
+            } else {
+              console.log(`Added to database.`);
+            }})
+        break;          
+          
 
         // Exits the main menu loop  
         case 'Exit':
@@ -237,6 +260,10 @@ async function mainMenu() {
     }
   }
   
+
+  async function updateRole () {
+    
+  }
   // call the mainMenu function to start the menu loop
 
   mainMenu();
