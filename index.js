@@ -95,14 +95,73 @@ async function mainMenu() {
 
         // Add a department
         case 'Add a department':
-            console.log('no rly3')
+            try{
+              const answer = await inquirer.prompt({
+                type: 'input',
+                message: 'What is the name of the department',
+                name: 'deptName',
+                validate: (answer) => {
+                    if (answer.length != 3) {
+                        return 'Please enter only 3 characters'
+                    }
+                    return true
+                }
+              })
+              db.query(`INSERT INTO departments (name) VALUES ('${answer.deptName}')`, (error) => {
+                if (error) {
+                  console.error(error);
+                } else {
+                  console.log(`Added department '${answer.deptName}' to database.`);
+                }
+              });
+          } catch (err) {
+            console.error(err)
+          }
           break;
 
 
         // Add a role  
         case 'Add a role':
-            console.log('no rly4')
-          break;
+          try{
+            const deptObj = await db.promise().query(`
+              SELECT NAME FROM employee_chart_db.departments;
+            `);                
+            const deptArr = deptObj[0]
+            const depts = deptArr.map(deptArr => deptArr.NAME)
+            console.log(depts)
+            const answer = await inquirer.prompt([{
+                type: 'input',
+                message: 'What is the name of the role?',
+                name: 'roleName'
+              },
+              {
+                type: 'input',
+                message: 'What is the salary?',
+                name: 'roleSalary'
+              },
+              {
+                type: 'list',
+                name: 'roleDept',
+                message: 'What is the department?',
+                choices: depts
+              }     
+                              
+            ])
+            console.log(answer)
+
+            // db.query(`INSERT INTO departments (name) VALUES ('${answer.deptName}')`, (error) => {
+            //   if (error) {
+            //     console.error(error);
+            //   } else {
+            //     console.log(`Added department '${answer.deptName}' to database.`);
+            //   }
+            // });
+          }
+         catch (err) {
+          console.error(err)
+        }
+        break;
+
 
 
         // Add an emmployee  
@@ -126,4 +185,7 @@ async function mainMenu() {
   }
   
   // call the mainMenu function to start the menu loop
+
   mainMenu();
+
+
