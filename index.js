@@ -144,23 +144,22 @@ async function mainMenu() {
                 name: 'roleDept',
                 message: 'What is the department?',
                 choices: depts
-              }     
-                              
-            ])
-            console.log(answer)
-
-            // db.query(`INSERT INTO departments (name) VALUES ('${answer.deptName}')`, (error) => {
-            //   if (error) {
-            //     console.error(error);
-            //   } else {
-            //     console.log(`Added department '${answer.deptName}' to database.`);
-            //   }
-            // });
+              }                             
+            ])            
+            const roleDept_id = depts.indexOf(answer.roleDept) + 1;
+            console.log(`INSERT INTO roles (title, department_id, salary) VALUES ('${answer.roleName}', ${roleDept_id}, ${answer.roleSalary} );`)
+            db.query(`INSERT INTO roles (title, department_id, salary) VALUES ('${answer.roleName}', ${roleDept_id}, ${answer.roleSalary} );`, (error) => {
+              if (error) {
+                console.error(error);
+              } else {
+                console.log(`Added department '${answer.deptName}' to database.`);
+              }
+            });
           }
-         catch (err) {
+          catch (err) {
           console.error(err)
-        }
-        break;
+          }
+          break;
 
 
 
