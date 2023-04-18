@@ -128,7 +128,6 @@ async function mainMenu() {
             `);                
             const deptArr = deptObj[0]
             const depts = deptArr.map(deptArr => deptArr.NAME)
-            console.log(depts)
             const answer = await inquirer.prompt([{
                 type: 'input',
                 message: 'What is the name of the role?',
@@ -147,7 +146,6 @@ async function mainMenu() {
               }                             
             ])            
             const roleDept_id = depts.indexOf(answer.roleDept) + 1;
-            console.log(`INSERT INTO roles (title, department_id, salary) VALUES ('${answer.roleName}', ${roleDept_id}, ${answer.roleSalary} );`)
             db.query(`INSERT INTO roles (title, department_id, salary) VALUES ('${answer.roleName}', ${roleDept_id}, ${answer.roleSalary} );`, (error) => {
               if (error) {
                 console.error(error);
@@ -162,11 +160,67 @@ async function mainMenu() {
           break;
 
 
-
-        // Add an emmployee  
+                  // Add an emmployee  
         case 'Add an employee':
-            console.log('no rly5')
-          break;
+          // queries the db and creates an array of roles
+          const roleObj = await db.promise().query(`
+              SELECT title FROM employee_chart_db.roles;
+            `);                           
+          const roleArr = roleObj[0]
+          const roles = roleArr.map(({ title }) => title)
+          
+          // queries the db and creates an array of managers
+          const managerObj = await db.promise().query(`
+              SELECT CONCAT(first_name, ' ', last_name) AS manager
+              FROM employees;`)
+          const managerArr = managerObj[0]
+          const managers = ['none', ...managerArr.map(({manager}) => manager)]
+          const answer = await inquirer.prompt([{
+            type: 'input',
+            message: 'What is the first name of the employee?',
+            name: 'empFirst'
+          },
+          {
+            type: 'input',
+            message: 'What is the last name of the employee?',
+            name: 'empLast'
+          },
+          {
+            type: 'list',
+            name: 'empRole',
+            message: 'What is the role of the employee?',
+            choices: roles
+          },
+          {
+            type: 'list',
+            name: 'empManager',
+            message: 'Who is the manager of the employee?',
+            choices: managers
+          }                            
+        ])
+          let empManager_id
+           const empRole_id = roles.indexOf(answer.empRole) + 1
+           if (answer.empManager === 'none') { // check if 'none' was selected
+            empManager_id = null; // set manager ID to null
+          } else {
+            empManager_id = managers.indexOf(answer.empManager) + 1;
+          }
+
+
+           db.query(`INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES ('${answer.empFirst}', '${answer.empLast}', ${empRole_id}, ${empManager_id} );`, (error) => {
+            if (error) {
+              console.error(error);
+            } else {
+              console.log(`Added department '${answer.deptName}' to database.`);
+            }
+          });
+           
+          
+          
+          
+          
+          
+            break;
 
 
         // Update an employee role  
