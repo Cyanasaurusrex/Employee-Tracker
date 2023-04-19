@@ -217,13 +217,11 @@ async function mainMenu() {
               FROM employees;`)
           const empArr = empObj[0]
           const employees = empArr.map(({employee}) => employee)
-          console.log(employees)
           const empRoleObj = await db.promise().query(`
               SELECT title FROM employee_chart_db.roles;
             `);                           
           const empRoleArr = empRoleObj[0]
           const empRoles = empRoleArr.map(({ title }) => title)
-          console.log(empRoles)
           const updateAnswer = await inquirer.prompt([
           {
             type: 'list',
@@ -240,7 +238,6 @@ async function mainMenu() {
           
           newRole_idObj = await db.promise().query(`SELECT id FROM roles WHERE title = '${updateAnswer.updateRole}';`)
           let newRole_id = newRole_idObj[0][0].id
-          console.log(newRole_id)
           
           const [first_name, last_name] = updateAnswer.updateEmployee.split(' ');
           db.query(`UPDATE employees SET role_id = ${newRole_id} WHERE first_name = '${first_name}' AND last_name = '${last_name}';`, (error) => {
