@@ -26,8 +26,9 @@ Now that the node modules are installed, run the following command:
 
 node index
 
-the application execution will take place entirely in the terminal. 
-  
+the application execution will take place entirely in the terminal.
+
+The SQL database must also be created and seeded for the default values to appear. In the 'db' folder there are files 'schema' and 'seeds'. The contents of these files must be copied into SQL wokbench and executed to create the tables.  
   
 ## Usage
 When the program is initialized, you will be on the main menu with many options. you may select the 'Exit' option to terminate the program. Select the desired option from the main menu and it will execute the task before returning you to the main menu.
